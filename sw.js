@@ -1,4 +1,4 @@
-const CACHE_NAME = 'supplier-field-scout-map-v1';
+const CACHE_NAME = 'supplier-field-scout-map-v2';
 const CORE_ASSETS = [
   './',
   './index.html',
