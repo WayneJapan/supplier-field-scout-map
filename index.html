@@ -8,127 +8,52 @@
 <link rel="manifest" href="./manifest.json">
 <link rel="icon" href="./icons/icon-192.png">
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
-
-<title>南通针织供应商考察地图</title>
+<title>南通代工厂实地考察地图</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{
-  --bg:#f5f6fa;--panel:#fff;--text:#1a1a2e;--muted:#6b7280;
-  --border:#e5e7eb;--blue:#2563eb;--red:#d93025;--amber:#f59e0b;
-  --shadow:0 4px 20px rgba(0,0,0,.08);--radius:16px;
-  --safe-bottom:env(safe-area-inset-bottom,0px);
-}
+:root{--bg:#f5f6fa;--panel:#fff;--text:#1a1a2e;--muted:#6b7280;--border:#e5e7eb;--blue:#2563eb;--red:#d93025;--amber:#f59e0b;--shadow:0 4px 20px rgba(0,0,0,.08);--radius:16px;--safe-bottom:env(safe-area-inset-bottom,0px)}
 html,body{width:100%;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--text);overflow:hidden;background:var(--bg)}
 #map{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0}
 .leaflet-control-zoom{display:none!important}
-
-/* Header overlay */
-.header{
-  position:fixed;top:12px;left:12px;right:12px;z-index:1000;
-  background:var(--panel);border-radius:14px;
-  box-shadow:var(--shadow);padding:12px 16px;
-  display:flex;align-items:center;justify-content:space-between;
-  max-width:500px;margin:0 auto;
-}
+.header{position:fixed;top:12px;left:12px;right:12px;z-index:1000;background:var(--panel);border-radius:14px;box-shadow:var(--shadow);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;max-width:500px;margin:0 auto}
 .header h1{font-size:16px;font-weight:700}
 .header .badge{font-size:11px;color:var(--muted);background:#f0f0f5;padding:3px 10px;border-radius:20px}
-
-/* Legend floating button */
-.legend-btn{
-  position:fixed;right:16px;bottom:160px;z-index:900;
-  width:44px;height:44px;border-radius:50%;
-  background:var(--panel);border:none;
-  box-shadow:0 2px 8px rgba(0,0,0,.12);
-  display:flex;align-items:center;justify-content:center;
-  font-size:20px;cursor:pointer;color:var(--text)
-}
-.center-btn{
-  position:fixed;right:16px;bottom:108px;z-index:900;
-  width:44px;height:44px;border-radius:50%;
-  background:var(--panel);border:none;
-  box-shadow:0 2px 8px rgba(0,0,0,.12);
-  display:flex;align-items:center;justify-content:center;
-  font-size:20px;cursor:pointer;color:var(--text)
-}
-
-/* Bottom sheet */
-.sheet-overlay{
-  display:none;position:fixed;top:0;left:0;right:0;bottom:0;
-  background:rgba(0,0,0,.3);z-index:1100
-}
+.legend-btn{position:fixed;right:16px;bottom:160px;z-index:900;width:44px;height:44px;border-radius:50%;background:var(--panel);border:none;box-shadow:0 2px 8px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;color:var(--text)}
+.center-btn{position:fixed;right:16px;bottom:108px;z-index:900;width:44px;height:44px;border-radius:50%;background:var(--panel);border:none;box-shadow:0 2px 8px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;color:var(--text)}
+.sheet-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.3);z-index:1100}
 .sheet-overlay.active{display:block}
-
-.bottom-sheet{
-  position:fixed;bottom:0;left:0;right:0;z-index:1200;
-  background:var(--panel);border-radius:20px 20px 0 0;
-  box-shadow:0 -4px 30px rgba(0,0,0,.15);
-  transform:translateY(calc(100% + 20px));
-  transition:transform .35s cubic-bezier(.4,0,.2,1);
-  max-height:75vh;display:flex;flex-direction:column;
-  padding-bottom:var(--safe-bottom);max-width:500px;margin:0 auto
-}
+.bottom-sheet{position:fixed;bottom:0;left:0;right:0;z-index:1200;background:var(--panel);border-radius:20px 20px 0 0;box-shadow:0 -4px 30px rgba(0,0,0,.15);transform:translateY(calc(100% + 20px));transition:transform .35s cubic-bezier(.4,0,.2,1);max-height:75vh;display:flex;flex-direction:column;padding-bottom:var(--safe-bottom);max-width:500px;margin:0 auto}
 .bottom-sheet.active{transform:translateY(0)}
-
 .handle-area{padding:10px 0 4px;display:flex;justify-content:center;cursor:grab}
 .handle{width:36px;height:4px;border-radius:2px;background:#d1d5db}
-
 .sheet-scroll{overflow-y:auto;padding:0 20px 20px;-webkit-overflow-scrolling:touch}
 .sheet-title{font-size:20px;font-weight:700;margin-bottom:4px;padding-right:40px}
 .sheet-sub{font-size:13px;color:var(--muted);margin-bottom:10px}
 .sheet-priority{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;margin-bottom:10px}
 .pri-A{background:#fef2f2;color:#dc2625}.pri-B{background:#fffbeb;color:#d97706}.pri-C{background:#eff6ff;color:#2563eb}.pri-起点{background:#f0fdf4;color:#16a34a}
-
 .sheet-actions{display:flex;gap:12px;margin:12px 0 16px;flex-wrap:wrap}
-.action-btn{
-  flex:1;min-width:72px;display:flex;flex-direction:column;align-items:center;
-  gap:6px;padding:10px;border-radius:12px;border:1px solid var(--border);
-  text-decoration:none;color:var(--text);font-size:11px;font-weight:500;
-  background:var(--panel);cursor:pointer;transition:all .15s
-}
+.action-btn{flex:1;min-width:72px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px;border-radius:12px;border:1px solid var(--border);text-decoration:none;color:var(--text);font-size:11px;font-weight:500;background:var(--panel);cursor:pointer;transition:all .15s}
 .action-btn:active{background:#f0f0f7;border-color:#ccc}
 .action-btn .icon{font-size:20px}
 .action-btn.call .icon{color:#22c55e}
 .action-btn.nav .icon{color:var(--blue)}
 .action-btn.copy .icon{color:#8b5cf6}
-
 .sheet-table{width:100%;border-collapse:collapse}
 .sheet-table td{padding:6px 0;font-size:13px;line-height:1.5;border-bottom:1px solid var(--border)}
 .sheet-table td:first-child{color:var(--muted);width:80px;vertical-align:top;padding-right:10px}
 .sheet-table td:last-child{word-break:break-all}
 .sheet-table tr:last-child td{border-bottom:none}
-
-.close-sheet{
-  position:absolute;top:14px;right:16px;width:32px;height:32px;
-  border-radius:50%;border:none;background:#f0f0f5;
-  font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  color:var(--muted)
-}
-
-/* Legend panel */
-.legend-panel{
-  display:none;position:fixed;bottom:60px;right:16px;z-index:1000;
-  background:var(--panel);border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.15);
-  padding:14px 16px;min-width:160px;
-}
+.close-sheet{position:absolute;top:14px;right:16px;width:32px;height:32px;border-radius:50%;border:none;background:#f0f0f5;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.legend-panel{display:none;position:fixed;bottom:60px;right:16px;z-index:1000;background:var(--panel);border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.15);padding:14px 16px;min-width:160px}
 .legend-panel.active{display:block}
 .legend-item{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px}
 .legend-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;border:2px solid rgba(0,0,0,.1)}
 .legend-line{width:24px;height:3px;border-radius:2px;background:#2563eb;opacity:.6;flex-shrink:0}
-
-/* Markers */
-.custom-marker{
-  width:12px;height:12px;border-radius:50%;
-  border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);
-}
+.custom-marker{width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3)}
 .custom-marker.start{width:16px;height:16px}
-.route-marker{
-  display:flex;align-items:center;justify-content:center;
-  width:22px;height:22px;border-radius:50%;
-  font-size:11px;font-weight:700;color:#fff;border:2px solid #fff;
-  box-shadow:0 1px 4px rgba(0,0,0,.3);
-}
+.route-marker{display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-size:11px;font-weight:700;color:#fff;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3)}
 </style>
 </head>
 <body>
@@ -137,18 +62,19 @@ html,body{width:100%;height:100%;font-family:-apple-system,BlinkMacSystemFont,"S
 
 <div class="header">
   <h1>🧶 南通供应商考察</h1>
-  <span class="badge">5家工厂 · 2天</span>
+  <span class="badge">3家工厂 · 2天</span>
 </div>
 
 <button class="legend-btn" onclick="toggleLegend()" aria-label="图例">🏷️</button>
 <button class="center-btn" onclick="fitAll()" aria-label="全览">📍</button>
 
 <div class="legend-panel" id="legendPanel">
-  <div class="legend-item"><span class="legend-dot" style="background:#d93025"></span> A级 · 立即联系</div>
-  <div class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span> B级 · 优先联系</div>
-  <div class="legend-item"><span class="legend-dot" style="background:#2563eb"></span> C级 · 备选</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#d93025"></span> 本日考察</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span> 次日考察</div>
   <div class="legend-item"><span class="legend-dot" style="background:#16a34a"></span> 出发点</div>
-  <div class="legend-item"><span class="legend-line"></span> 考察路线</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#8b5cf6"></span> 酒店住宿</div>
+  <div class="legend-item"><span class="legend-line"></span> Day1 路线</div>
+  <div class="legend-item"><span class="legend-line" style="background:#f59e0b"></span> Day2 路线</div>
 </div>
 
 <div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()"></div>
@@ -161,11 +87,64 @@ html,body{width:100%;height:100%;font-family:-apple-system,BlinkMacSystemFont,"S
 
 <script>
 // ========== DATA ==========
-const geojson = {"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "Point", "coordinates": [121.3769, 31.1148]}, "properties": {"name": "上海闵行起点", "address": "", "phone": "", "mobile_phone": "", "email": "", "website": "", "craft_type": "", "grade": "起点", "grade_color": "#188038", "grade_order": 0, "size_description": "出发地", "annual_output": "", "export_clients": "", "certification": "", "priority": "", "notes": "上海市闵行区"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [121.185, 32.315]}, "properties": {"name": "南通妍阳工艺品有限公司", "address": "", "phone": "0513-84101280", "mobile_phone": "", "email": "", "website": "http://www.yycrafts.cn", "craft_type": "手工棒针+钩针编织", "grade": "A", "grade_color": "#d93025", "grade_order": 1, "size_description": "20000+手编工 | 40余设计打样师 | 7500㎡厂房", "annual_output": "年产200万件+", "export_clients": "ZARA/NEXT/C&A/BESTSELLER | 欧美日韩20+国", "certification": "ISO（待索取）", "priority": "🔴 立即联系", "notes": "规模最大·出口背书最强·手工编织标杆企业"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [120.48, 32.64]}, "properties": {"name": "南通七巧手编结有限公司", "address": "", "phone": "0513-88919533", "mobile_phone": "", "email": "kaidun@126.com", "website": "http://www.ntyinzhen.com", "craft_type": "手工钩针+棒针", "grade": "B", "grade_color": "#f9ab00", "grade_order": 2, "size_description": "年产45万件 | 专业手工编织", "annual_output": "钩针衣20万件+棒针衣15万件", "export_clients": "内销为主（无出口记录）", "certification": "", "priority": "🔴 立即联系", "notes": "产能数据最清晰·内销为主·电话邮箱双渠道"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [120.955, 32.465]}, "properties": {"name": "南通晨派针织服装有限公司", "address": "", "phone": "400-058-7268", "mobile_phone": "13776959292", "email": "xiaozhang001@126.com", "website": "http://www.ntchenpai.com", "craft_type": "手工针织毛衣帽子饰品", "grade": "B", "grade_color": "#f9ab00", "grade_order": 2, "size_description": "15年经验 | 小单可接", "annual_output": "未明确", "export_clients": "ANN TAYLOR/TOMMY HILFIGER/BOSS/BURBERRY", "certification": "品牌真实性待验证", "priority": "🔴 立即联系", "notes": "5大国际品牌背书·需验证真实性·小单灵活"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [121.18, 32.334]}, "properties": {"name": "南通健辉工艺服饰有限公司", "address": "", "phone": "0513-84681988", "mobile_phone": "", "email": "Alibaba询盘", "website": "https://jianhuicraft.en.alibaba.com", "craft_type": "手工钩针+棒针帽子围巾手套", "grade": "A", "grade_color": "#d93025", "grade_order": 1, "size_description": "301-500人", "annual_output": "未明确", "export_clients": "出口为主", "certification": "Alibaba金品供应商", "priority": "🟡 联系确认地址", "notes": "联系人李继宏·需确认精确地址·规模较大"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [121.015, 32.345]}, "properties": {"name": "南通晶漫服饰有限公司", "address": "", "phone": "", "mobile_phone": "13921691609", "email": "2843169701@qq.com", "website": "http://ntjingman.com", "craft_type": "手工钩针帽子围巾手套", "grade": "C", "grade_color": "#1a73e8", "grade_order": 3, "size_description": "2022年新厂 | 规模较小", "annual_output": "未明确", "export_clients": "无出口", "certification": "", "priority": "⚪ 备选", "notes": "2022年新厂·规模小·时间充裕可顺路看"}}, {"type": "Feature", "geometry": {"type": "LineString", "coordinates": [[121.3769, 31.1148], [121.185, 32.315], [121.015, 32.345], [120.955, 32.465], [121.18, 32.334], [120.48, 32.64]]}, "properties": {"type": "route", "name": "考察路线", "total_distance_km": 320, "total_duration_min": "两天", "stop_count": 5}}]};
+const geojson = {"type": "FeatureCollection", "features": [
+  {"type": "Feature", "geometry": {"type": "Point", "coordinates": [121.3769, 31.1148]}, "properties": {
+    "name": "🚗 上海出发",
+    "address": "上海市闵行区",
+    "phone": "", "mobile_phone": "", "email": "", "website": "",
+    "grade": "起点", "grade_color": "#188038", "grade_order": 0,
+    "size_description": "出发地",
+    "notes": "G15沈海高速 → 南通方向 → 如皋出口",
+    "visit_time": "07:00 出发",
+    "day": 1
+  }},
+  {"type": "Feature", "geometry": {"type": "Point", "coordinates": [120.5737, 32.3825]}, "properties": {
+    "name": "🏭 本意手工艺",
+    "address": "江苏省南通市如皋市（坐标近似）",
+    "phone": "", "mobile_phone": "", "email": "", "website": "",
+    "grade": "本日", "grade_color": "#d93025", "grade_order": 1,
+    "size_description": "待确认",
+    "notes": "如皋市 · 手工编织类",
+    "visit_time": "10:30-11:00",
+    "day": 1
+  }},
+  {"type": "Feature", "geometry": {"type": "Point", "coordinates": [121.185, 32.315]}, "properties": {
+    "name": "🏭 南通妍阳工艺品有限公司",
+    "address": "如东县掘港镇江海东路184号",
+    "phone": "0513-84101280", "mobile_phone": "13585174851", "email": "", "website": "http://www.yycrafts.cn",
+    "grade": "本日", "grade_color": "#d93025", "grade_order": 2,
+    "size_description": "20000+手编工 | 40+打样师 | 7500㎡",
+    "notes": "⭐ 规模最大 · 40+钩针包款 · ZARA/NEXT背书",
+    "contact": "秦宁妍 13585174851 / 400-668-2848",
+    "visit_time": "14:00-15:30",
+    "day": 1
+  }},
+  {"type": "Feature", "geometry": {"type": "Point", "coordinates": [121.18, 32.33]}, "properties": {
+    "name": "🏨 掘港住宿推荐",
+    "address": "如东掘港镇",
+    "phone": "", "mobile_phone": "", "email": "", "website": "",
+    "grade": "住宿", "grade_color": "#8b5cf6", "grade_order": 3,
+    "size_description": "亚朵/全季/锦恒君澜",
+    "notes": "妍阳附近，驾车10分钟",
+    "visit_time": "入住",
+    "day": 1
+  }},
+  {"type": "Feature", "geometry": {"type": "Point", "coordinates": [120.48, 32.64]}, "properties": {
+    "name": "🏭 南通七巧手编结有限公司",
+    "address": "海安市南莫镇黄陈村十组（待确认精确地址）",
+    "phone": "0513-88919533", "mobile_phone": "13806276533", "email": "kaidun@126.com", "website": "http://www.ntyinzhen.com",
+    "grade": "次日", "grade_color": "#f59e0b", "grade_order": 4,
+    "size_description": "150+人自营 | 年产45万件",
+    "notes": "非遗背书(2026.5录入) · 40年历史 · 张晓华总经理",
+    "contact": "张晓华 13806276533",
+    "visit_time": "10:00-11:30",
+    "day": 2
+  }}
+]};
 
 // ========== MAP ==========
 const map = L.map('map', {
-  center: [32.05, 121.15],
+  center: [32.1, 120.9],
   zoom: 9,
   zoomControl: false,
   attributionControl: false,
@@ -185,11 +164,6 @@ geojson.features.forEach(f => {
   const coords = f.geometry.coordinates;
   const latlng = [coords[1], coords[0]];
 
-  // Route line
-  if (props.type === 'route') {
-    return; // handled separately
-  }
-
   const isStart = props.grade === '起点';
   const iconColor = props.grade_color || '#666';
   const iconSize = isStart ? [22, 22] : [18, 18];
@@ -203,34 +177,58 @@ geojson.features.forEach(f => {
   const marker = L.marker(latlng, {icon}).addTo(map);
   marker._props = props;
   markers.push(marker);
+  if (!isStart) routePoints.push(latlng);
 
   marker.on('click', () => showSheet(props));
 });
 
-// Route line
-geojson.features.forEach(f => {
-  const props = f.properties || {};
-  if (props.type === 'route' && f.geometry.type === 'LineString') {
-    const points = f.geometry.coordinates.map(c => [c[1], c[0]]);
-    L.polyline(points, {
-      color: '#2563eb',
-      weight: 3,
-      opacity: 0.5,
-      dashArray: '8, 6',
-    }).addTo(map);
+// Day 1 route: 上海 → 本意(如皋) → 妍阳(如东掘港)
+const routeDay1 = [
+  [31.1148, 121.3769],  // 上海
+  [32.3825, 120.5737],  // 本意(如皋)
+  [32.315, 121.185],    // 妍阳(掘港)
+];
+L.polyline(routeDay1, {
+  color: '#2563eb',
+  weight: 3,
+  opacity: 0.5,
+  dashArray: '8, 6',
+}).addTo(map);
 
-    // Annotated route order markers (waypoints)
-    points.forEach((p, i) => {
-      if (i === 0) return; // skip start
-      const numIcon = L.divIcon({
-        className: 'route-marker',
-        html: `<div style="width:100%;height:100%;border-radius:50%;background:#2563eb;display:flex;align-items:center;justify-content:center">${i}</div>`,
-        iconSize: [22, 22],
-        iconAnchor: [11, 11],
-      });
-      L.marker(p, {icon: numIcon, interactive: false}).addTo(map);
-    });
-  }
+// Route markers for Day 1
+routeDay1.forEach((p, i) => {
+  if (i === 0) return;
+  const numIcon = L.divIcon({
+    className: 'route-marker',
+    html: `<div style="width:100%;height:100%;border-radius:50%;background:#2563eb;display:flex;align-items:center;justify-content:center">${i}</div>`,
+    iconSize: [22, 22],
+    iconAnchor: [11, 11],
+  });
+  L.marker(p, {icon: numIcon, interactive: false}).addTo(map);
+});
+
+// Day 2 route: 掘港→七巧手(海安)
+const routeDay2 = [
+  [32.315, 121.185],    // 掘港
+  [32.64, 120.48],      // 七巧手(海安)
+];
+L.polyline(routeDay2, {
+  color: '#f59e0b',
+  weight: 3,
+  opacity: 0.5,
+  dashArray: '6, 8',
+}).addTo(map);
+
+// Route markers for Day 2
+routeDay2.forEach((p, i) => {
+  if (i === 0) return;
+  const numIcon = L.divIcon({
+    className: 'route-marker',
+    html: `<div style="width:100%;height:100%;border-radius:50%;background:#f59e0b;display:flex;align-items:center;justify-content:center">4</div>`,
+    iconSize: [22, 22],
+    iconAnchor: [11, 11],
+  });
+  L.marker(p, {icon: numIcon, interactive: false}).addTo(map);
 });
 
 function fitAll() {
@@ -243,19 +241,14 @@ fitAll();
 function showSheet(props) {
   const content = document.getElementById('sheetContent');
   const grade = props.grade || '';
-  const priClass = grade === 'A' ? 'pri-A' : grade === 'B' ? 'pri-B' : grade === 'C' ? 'pri-C' : 'pri-起点';
+  const priClass = grade === '本日' ? 'pri-A' : grade === '次日' ? 'pri-B' : grade === '起点' ? 'pri-起点' : 'pri-C';
 
-  // Build phone/nav links
   const phone = props.phone || props.mobile_phone || '';
   const mobile = props.mobile_phone || '';
   const telLink = phone ? `<a href="tel:${phone}" class="action-btn call"><span class="icon">📞</span>拨打电话</a>` : '';
   const mobLink = mobile && mobile !== phone ? `<a href="tel:${mobile}" class="action-btn call"><span class="icon">📱</span>拨打手机</a>` : '';
 
-  const navCoords = props._navCoords || '';
-  const navLink = `<a href="https://uri.amap.com/marker?position=${coords()}&name=${encodeURIComponent(props.name)}" target="_blank" class="action-btn nav"><span class="icon">🧭</span>高德导航</a>`;
-
-  function coords() {
-    // find this feature's coords
+  function getCoords() {
     for (const f of geojson.features) {
       if (f.properties && f.properties.name === props.name && f.geometry && f.geometry.type === 'Point') {
         return f.geometry.coordinates.join(',');
@@ -263,34 +256,31 @@ function showSheet(props) {
     }
     return '';
   }
+  const navLink = `<a href="https://uri.amap.com/marker?position=${getCoords()}&name=${encodeURIComponent(props.name)}" target="_blank" class="action-btn nav"><span class="icon">🧭</span>高德导航</a>`;
+
+  const dayLabel = props.day === 1 ? 'Day 1 · 5/30 周六' : props.day === 2 ? 'Day 2 · 5/31 周日' : '';
 
   content.innerHTML = `
     <div class="sheet-title">${props.name}</div>
-    <div class="sheet-priority ${priClass}">${props.priority || grade}</div>
-    <div class="sheet-sub">${props.notes || ''}</div>
+    ${props.visit_time ? `<div style="font-size:14px;font-weight:600;color:var(--blue);margin:-4px 0 8px">⏰ ${props.visit_time}${dayLabel ? ' · ' + dayLabel : ''}</div>` : ''}
+    <div class="sheet-priority ${priClass}">${props.notes || grade}</div>
+    <div class="sheet-sub">${props.size_description || ''}</div>
+    ${props.contact ? `<div style="background:#f0fdf4;padding:8px 12px;border-radius:8px;margin:0 0 10px;font-size:13px;color:#166534"><strong>👤 联系人：</strong>${props.contact}</div>` : ''}
     <div class="sheet-actions">
       ${telLink}
       ${mobLink}
       ${navLink}
-      <button class="action-btn copy" onclick="copyInfo('${encodeURIComponent(props.name + '\\n' + props.note_address || '')}')"><span class="icon">📋</span>复制</button>
+      <button class="action-btn copy" onclick="copyInfo('${encodeURIComponent(props.name + '\\n' + (props.address || ''))}')"><span class="icon">📋</span>复制</button>
     </div>
     <table class="sheet-table">
-      ${props.craft_type ? `<tr><td>工艺</td><td>${props.craft_type}</td></tr>` : ''}
       ${props.address ? `<tr><td>地址</td><td>${props.address}</td></tr>` : ''}
       ${props.phone ? `<tr><td>固话</td><td><a href="tel:${props.phone}" style="color:var(--blue);text-decoration:none">${props.phone}</a></td></tr>` : ''}
       ${props.mobile_phone ? `<tr><td>手机</td><td><a href="tel:${props.mobile_phone}" style="color:var(--blue);text-decoration:none">${props.mobile_phone}</a></td></tr>` : ''}
       ${props.email ? `<tr><td>邮箱</td><td>${props.email}</td></tr>` : ''}
       ${props.website ? `<tr><td>网站</td><td><a href="${props.website}" target="_blank" style="color:var(--blue);text-decoration:none;word-break:break-all">${props.website}</a></td></tr>` : ''}
       ${props.size_description ? `<tr><td>规模</td><td>${props.size_description}</td></tr>` : ''}
-      ${props.annual_output ? `<tr><td>产能</td><td>${props.annual_output}</td></tr>` : ''}
-      ${props.export_clients ? `<tr><td>客户</td><td>${props.export_clients}</td></tr>` : ''}
-      ${props.certification ? `<tr><td>认证</td><td>${props.certification}</td></tr>` : ''}
-      ${props.craft_type ? `<tr><td>工艺</td><td>${props.craft_type}</td></tr>` : ''}
     </table>
-    <div style="margin-top:12px;padding:12px;border-radius:10px;background:#f8f9ff;font-size:13px;line-height:1.6">
-      <strong>💡 考察要点</strong><br>
-      ${getTips(props.name, grade)}
-    </div>
+    ${getTips(props.name, grade)}
   `;
 
   document.getElementById('bottomSheet').classList.add('active');
@@ -299,13 +289,11 @@ function showSheet(props) {
 
 function getTips(name, grade) {
   const tips = {
-    "南通妍阳工艺品有限公司": "• 询问ISO证书具体标准<br>• 索取BSCI认证证书<br>• 问清楚20000手编工的管理模式（外协还是自营）<br>• 要求看ZARA合作案例<br>• 重点问MOQ和打版政策",
-    "南通七巧手编结有限公司": "• 核心问：是否能做出口品质？<br>• 验证打样能力（内销转外销的gap）<br>• 确认MOQ和打版周期<br>• 看样品间实物品质",
-    "南通晨派针织服装有限公司": "• ⚠️ 重点验证ANNTaylor/TOMMY合作真实性<br>• 要求提供品牌合作证明<br>• 小单起订量具体多少？<br>• 看正在生产的样品评估品质",
-    "南通健辉工艺服饰有限公司": "• 确认精确地址（如东具体位置）<br>• Alibaba金品供应商可先看线上店铺<br>• 问是否做手工包袋类产品<br>• 确认出口经验和合作流程",
-    "南通晶漫服饰有限公司": "• 2022年新厂，重点看车间和设备<br>• 询问发展方向和产能规划<br>• 适合小单试水",
+    "🏭 本意手工艺": "<div style='margin-top:12px;padding:12px;border-radius:10px;background:#f8f9ff;font-size:13px;line-height:1.6'><strong>💡 考察要点</strong><br>• 确认是否做手工钩针包<br>• 问MOQ和打版周期<br>• 看样品实物和工艺水平<br>• 摸清价格区间</div>",
+    "🏭 南通妍阳工艺品有限公司": "<div style='margin-top:12px;padding:12px;border-radius:10px;background:#f8f9ff;font-size:13px;line-height:1.6'><strong>💡 考察要点</strong><br>• 确认ISO证书标准<br>• 问清楚20000手编工管理模式<br>• 要求看ZARA/NEXT合作案例<br>• ⭐ 重点看钩针包样品（40+款）<br>• 问MOQ、打版费、出厂价</div>",
+    "🏭 南通七巧手编结有限公司": "<div style='margin-top:12px;padding:12px;border-radius:10px;background:#f8f9ff;font-size:13px;line-height:1.6'><strong>💡 考察要点</strong><br>• 核心问：能否做钩针包/配件？<br>• 非遗背书可做品牌故事<br>• 确认南莫镇精确地址<br>• 看样品间实物品质<br>• 问打版周期和费用</div>",
   };
-  return tips[name] || '• 看工厂车间环境<br>• 问MOQ、打版周期、交期<br>• 拿名片、加微信';
+  return tips[name] || '';
 }
 
 function closeSheet() {
